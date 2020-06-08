@@ -1,0 +1,46 @@
+#!/bin/bash
+set -x
+
+
+BIN_PATH="$( cd "$( dirname "$0" )" && pwd )"
+BASEDIR="$( cd "${BIN_PATH}/.." && pwd )"
+
+if [ -f $BASEDIR/var/env_conf.sh ]; then
+    source $BASEDIR/var/env_conf.sh
+fi
+
+BINARY=bin/$APPNAME
+LOG=$BASEDIR/logs/$APPNAME.log
+PID=$BASEDIR/logs/$APPNAME.pid
+
+export BASEDIR APPNAME INSTANCENAME
+case $1 in
+    start)
+        # Start app, write pid in $PID
+        cd $BASEDIR
+        /usr/bin/env  $BINARY >> $LOG 2>&1 &
+        echo $! > $PID
+        echo 'Started'
+    ;;
+    stop)
+        # Stop app, delete $PID
+        kill `cat $PID`
+        rm $PID
+        echo 'Stopped'
+    ;;
+    status)
+        if [ ! -e "$PID" ]; then
+            echo "[$APPNAME] not running!"
+        else
+            P=$(cat "$PID" | sed 's/[\r\n]//')
+            echo "[$APPNAME] running - PID: $P"
+        fi
+    ;;
+    install|configure)
+        # no-op
+    ;;
+    *)
+        echo "$0: Unknown argument $1"
+        exit 1
+    ;;
+esac

@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+  <!-- Jetty server configurations -->
+  <property>
+    <description>Jetty server maximum thread count</description>
+    <name>jetty.maxThreads</name>
+    <value>50</value>
+  </property>
+
+  <property>
+    <description>Jetty server minimum thread count</description>
+    <name>jetty.minThreads</name>
+    <value>10</value>
+  </property>
+
+  <property>
+    <description>Jetty server idle timeout in seconds</description>
+    <name>jetty.idleTimeout</name>
+    <value>120</value>
+  </property>
+
+  <!-- Token Fetcher Service configurations -->
+  <property>
+    <description>Super user keytab location</description>
+    <name>kube2hadoop.keytab.location</name>
+    <value>/path/to/keytab</value>
+  </property>
+
+  <property>
+    <description>Kube2Hadoop token renewer name</description>
+    <name>kube2hadoop.renewer.name</name>
+    <value>default</value>
+  </property>
+
+  <!-- Kubernetes Authenticator configurations -->
+
+  <property>
+    <description>Kubernetes api server host ip</description>
+    <name>kubernetes.service.host</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>Kubernetes api server port</description>
+    <name>kubernetes.service.port</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>LDAP Provider URL for LDAP lookup</description>
+    <name>kube2hadoop.authenticator.ldap-provider-url</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>Group domain to perform the LDAP lookup</description>
+    <name>kube2hadoop.authenticator.ldap-group-domain</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>Location of Kubernetes token file</description>
+    <name>kube2hadoop.token.location</name>
+    <value>/path/to/token</value>
+  </property>
+
+  <property>
+    <description>Location of certificate file</description>
+    <name>kube2hadoop.cert.location</name>
+    <value>/path/to/cert</value>
+  </property>
+
+  <property>
+    <description>
+      Label selector string (can use regex) for filtering which pods to watch from Kubernetes API server
+    </description>
+    <name>kubernetes.watch.labelselector</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>Hadoop configuration file directory</description>
+    <name>hadoop.conf.dir</name>
+    <value>/path/to/hadoop/conf/dir</value>
+  </property>
+
+</configuration>

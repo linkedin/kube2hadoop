@@ -1,0 +1,106 @@
+apiVersion: "kubeflow.org/v1"
+kind: TFJob
+# instruction: search for "myjob", replace it
+metadata:
+  name: tensorflowin-from-hfds-dt-cpu
+  annotations:
+    x: y
+spec:
+  tfReplicaSpecs:
+    Ps:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            doAs: X
+        spec:
+          initContainers: &initContainers
+          - name: tokenfetcher
+            image: <some.artifactory.url:0.0.1>
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/bash"]
+            args: ["-c", "some arguments"]
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+              requests:
+                cpu: 1000m
+                memory: 2Gi
+            env:
+            - name: HDFS_NAMENODE_URI
+              value: "hdfs://namenode.url:0000"
+            - name: HEADLESS_USER
+              value: "superuser"
+          containers:
+            - name: tensorflow
+              image: &image <some.artifactory.url:0.0.1>
+              command: ["/bin/sh", "-c"]
+              args: &args ["python3 /code/tensorflowin_estimator_template_tutorial.py"]
+              env: &env
+              - name: HADOOP_TOKEN_FILE_LOCATION
+                value: /var/tmp/delegationtoken
+              - name: HDFS_NAMENODE_URI
+                value: "hdfs://namenode.url:0000"
+              - name: HEADLESS_USER
+                value: "superuser"
+      tfReplicaType: PS
+    Chief:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            doAs: X
+
+        spec:
+          initContainers: *initContainers
+          containers:
+            - name: tensorflow
+              image: *image
+#              resources:
+#                limits:
+#                  nvidia.com/gpu: 1 # requesting 1 GPU
+              command: ["/bin/sh", "-c"]
+              args: *args
+              env: *env
+      tfReplicaType: MASTER
+    Worker:
+      replicas: 4
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            doAs: X
+        spec:
+          initContainers: *initContainers
+          containers:
+            - name: tensorflow
+              image: *image
+#              resources:
+#                limits:
+#                  nvidia.com/gpu: 1 # requesting 1 GPU
+              command: ["/bin/sh", "-c"]
+              args: *args
+              env: *env
+      tfReplicaType: WORKER
+    Evaluator:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            doAs: X
+        spec:
+          initContainers: *initContainers
+          containers:
+            - name: tensorflow
+              image: *image
+#              resources:
+#                limits:
+#                  nvidia.com/gpu: 1 # requesting 1 GPU
+              command: ["/bin/sh", "-c"]
+              args: *args
+              env: *env
+      tfReplicaType: WORKER

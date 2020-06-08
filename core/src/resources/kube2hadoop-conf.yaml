@@ -1,0 +1,103 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kube2hadoop-conf
+data:
+  kube2hadoop.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+    <configuration>
+      <!-- Jetty server configurations -->
+      <property>
+        <description>Jetty server maximum thread count</description>
+        <name>jetty.maxThreads</name>
+        <value>100</value>
+      </property>
+
+      <property>
+        <description>Jetty server minimum thread count</description>
+        <name>jetty.minThreads</name>
+        <value>10</value>
+      </property>
+
+      <property>
+        <description>Jetty server idle timeout in seconds</description>
+        <name>jetty.idleTimeout</name>
+        <value>120</value>
+      </property>
+
+      <!-- Token Fetcher Service configurations -->
+      <property>
+        <description>Super user keytab location</description>
+        <name>kube2hadoop.keytab.location</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>Kube2Hadoop token renewer name</description>
+        <name>kube2hadoop.renewer.name</name>
+        <value></value>
+      </property>
+
+      <!-- Kubernetes Authenticator configurations -->
+
+      <property>
+        <description>Kubernetes api server host ip</description>
+        <name>kubernetes.service.host</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>Kubernetes api server port</description>
+        <name>kubernetes.service.port</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>LDAP Provider URL for LDAP lookup</description>
+        <name>kube2hadoop.authenticator.ldap-provider-url</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>Group domain to perform the LDAP lookup</description>
+        <name>kube2hadoop.authenticator.ldap-group-domain</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>Location of Kubernetes token file</description>
+        <name>kube2hadoop.token.location</name>
+        <value>/var/run/secrets/kubernetes.io/serviceaccount/token</value>
+      </property>
+
+      <property>
+        <description>Location of certificate file</description>
+        <name>kube2hadoop.cert.location</name>
+        <value>/var/run/secrets/kubernetes.io/serviceaccount/ca.crt</value>
+      </property>
+
+      <property>
+        <description>
+          Label selector string (can use regex) for filtering which pods to watch from Kubernetes API server
+        </description>
+        <name>kubernetes.watch.labelselector</name>
+        <value></value>
+      </property>
+
+      <property>
+        <description>Hadoop configuration file directory</description>
+        <name>hadoop.conf.dir</name>
+        <value></value>
+      </property>
+    </configuration>
+  log4j.properties: |
+    #root logger option
+    log4j.rootLogger=INFO, stdout
+
+    # Direct log messages to stdout
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.Target=System.out
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n

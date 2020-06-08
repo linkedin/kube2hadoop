@@ -1,0 +1,8 @@
+dependencies {
+  compile deps.external.procfs
+  compile deps.external.zap
+  compile deps.external.clientgo
+  compile deps.external.prometheus
+  compile deps.external.testify
+  compile deps.external.'go-logging'
+}

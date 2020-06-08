@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+  compile(deps.external.'jetty-server') {
+    exclude group: 'org.eclipse.jetty.util.log'
+  }
+  compile (deps.external.'jetty-servlet') {
+    exclude group: 'org.eclipse.jetty.util.log'
+  }
+  compile deps.external.'jetty-webapp'
+  compile deps.external.guava
+  compile deps.external.k8sclient
+  compile deps.hadoop.common
+  compile deps.hadoop.hdfs
+  compile project(':core')
+
+  testCompile deps.external.mockito
+  testCompile deps.external.testng
+}
+
+shadowJar {
+  mergeServiceFiles()
+  dependencies {
+
+  }
+  zip64 true
+}

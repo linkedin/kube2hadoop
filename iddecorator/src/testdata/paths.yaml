@@ -1,0 +1,20 @@
+configs:
+  alltypes:
+    paths:
+      - /spec/tfReplicaSpecs/Ps/template
+      - /spec/tfReplicaSpecs/Chief/template
+      - /spec/tfReplicaSpecs/Worker/template
+      - /spec/tfReplicaSpecs/Evaluator/template
+    neverOverwriteAccounts: []
+  tfjobs:
+    paths:
+      - /spec/tfReplicaSpecs/Ps/template
+      - /spec/tfReplicaSpecs/Chief/template
+      - /spec/tfReplicaSpecs/Worker/template
+      - /spec/tfReplicaSpecs/Evaluator/template
+    neverOverwriteAccounts: []
+  pods:
+    paths:
+    - /
+    neverOverwriteAccounts:
+    - system:serviceaccount:\S+

@@ -1,0 +1,65 @@
+apiVersion: kubeflow.org/v1alpha2
+kind: MPIJob
+metadata:
+  name: tensorflow-benchmarks-0815
+  annotations:
+    x: y
+spec:
+  slotsPerWorker: 1
+  cleanPodPolicy: All
+  mpiReplicaSpecs:
+    Launcher:
+      replicas: 1
+      template:
+        metadata:
+          annotations:
+            doAs: X
+        spec:
+           containers:
+           - image: <some.artifactory.url:0.0.1>
+             name: tensorflow-benchmarks-0815
+             command:
+             - mpirun
+             - --allow-run-as-root
+             - -np
+             - "2"
+             - -bind-to
+             - none
+             - -map-by
+             - slot
+             - -x
+             - NCCL_DEBUG=INFO
+             - -x
+             - LD_LIBRARY_PATH
+             - -x
+             - PATH
+             - -mca
+             - pml
+             - ob1
+             - -mca
+             - btl
+             - ^openib
+             - -mca
+             - btl_tcp_if_exclude
+             - lo,cni0
+             - -x
+             - NCCL_SOCKET_IFNAME=bond0
+             - python3
+             - scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py
+             - --model=resnet101
+             - --batch_size=64
+             - --variable_update=horovod
+    Worker:
+      replicas: 2
+      template:
+        metadata:
+          annotations:
+            doAs: X
+        spec:
+          hostNetwork: true
+          containers:
+          - image: <some.artifactory.url:0.0.1>
+            name: tensorflow-benchmarks-0815
+            resources:
+              limits:
+                nvidia.com/gpu: 1
