@@ -8,15 +8,19 @@ package com.linkedin.kube2hadoop.authenticator;
 import com.google.common.collect.ImmutableMap;
 import com.linkedin.kube2hadoop.core.Constants;
 import com.linkedin.kube2hadoop.core.TokenServiceException;
+import com.linkedin.kube2hadoop.core.conf.ConfigurationKeys;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.V1ObjectMeta;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.models.V1PodStatus;
 import io.kubernetes.client.util.Watch;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hadoop.conf.Configuration;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,6 +41,8 @@ public class TestKubernetesAuthenticator {
     authenticator = mock(KubernetesAuthenticator.class);
     when(authenticator.getWatchCache()).thenCallRealMethod();
     when(authenticator.getAuthenticatedUserID(any())).thenCallRealMethod();
+    when(authenticator.checkAgainstBlacklist(any())).thenCallRealMethod();
+    when(authenticator.getBlackListedSuperUsers(any())).thenCallRealMethod();
     doCallRealMethod().when(authenticator).setWatchCache(any());
     doCallRealMethod().when(authenticator).updateWatchCache(any());
 
@@ -96,6 +102,16 @@ public class TestKubernetesAuthenticator {
     authenticator.setWatchCache(watchCache);
     Assert.assertEquals(authenticator.getAuthenticatedUserID(params), userID);
   }
+
+  @Test
+  public void testGetBlackListedSuperUsers() {
+    List<String> expectedBlackListedUsers = Arrays.asList("testUser", "testUser1");
+    Configuration conf = new Configuration();
+    conf.set(ConfigurationKeys.KUBE2HADOOP_AUTHENTICATOR_BLACKLISTED_USERS, "testUser, testUser1");
+    List<String> actualBlackListedUsers = authenticator.getBlackListedSuperUsers(conf);
+    Assert.assertEquals(actualBlackListedUsers, expectedBlackListedUsers);
+  }
+
 
   @Test(expectedExceptions = TokenServiceException.class)
   public void testGetAuthenticatedUserIDFailed() {

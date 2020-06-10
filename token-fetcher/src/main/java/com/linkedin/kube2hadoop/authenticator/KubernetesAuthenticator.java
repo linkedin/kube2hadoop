@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +54,7 @@ public class KubernetesAuthenticator implements Authenticator {
   // Map of namespace -> (pod name -> (podIP, annotations))
   private Map<String, Map<String, Pair<String, Map<String, String>>>> watchCache = new ConcurrentHashMap<>();
   private Map<String, KubernetesNamespaceWatch> namespaceWatchCache = new ConcurrentHashMap<>();
+  private List<String> blackListedSuperUsers;
 
   /**
    * First checks {@code watchCache}, if given pod name does not exist in {@code watchCache} (which could mean that the
@@ -106,7 +109,7 @@ public class KubernetesAuthenticator implements Authenticator {
     // Add annotations to params for AuthenticatorDecorators
     params.addAllToParams(podMetadata.getValue());
 
-    return podMetadata.getValue().get(KUBERNETES_USER_ID);
+    return checkAgainstBlacklist(podMetadata.getValue().get(KUBERNETES_USER_ID));
   }
 
   @Override
@@ -127,6 +130,7 @@ public class KubernetesAuthenticator implements Authenticator {
 
     String tokenFileLocation = conf.get(ConfigurationKeys.KUBE2HADOOP_TOKEN_FILE_LOCATION);
     String certFileLocation = conf.get(ConfigurationKeys.KUBE2HADOOP_CERT_LOCATION);
+    blackListedSuperUsers = getBlackListedSuperUsers(conf);
 
     ApiClient k8sClient = Config.fromToken(k8sUrl, getTokenString(tokenFileLocation));
     k8sClient.setSslCaCert(getCertInputStream(certFileLocation));
@@ -136,6 +140,16 @@ public class KubernetesAuthenticator implements Authenticator {
     api = new CoreV1Api();
 
     runWatchThread();
+  }
+
+  /**
+   * Read a comma-separated list of blacklisted users from conf and return in List format.
+   * @return list of blacklisted users or empty list if conf not set
+   */
+  List<String> getBlackListedSuperUsers(Configuration conf) {
+    return Arrays.asList(
+        conf.get(ConfigurationKeys.KUBE2HADOOP_AUTHENTICATOR_BLACKLISTED_USERS, "")
+            .split("\\s*,\\s*"));
   }
 
   /**
@@ -185,6 +199,26 @@ public class KubernetesAuthenticator implements Authenticator {
     }
 
     return retStream;
+  }
+
+  /**
+   * This is to limit the exposure to data leak in the scenario when a Kubernetes admin
+   * account has been compromised. A Kubernetes admin impersonating an HDFS superuser can
+   * get access to data belonging to multiple HDFS accounts. Blacklisting superusers from
+   * using Kube2Hadoop forces an attacker to impersonate user accounts one at a time
+   * (and leaving audit trails of requesting delegation tokens for those users).
+   *
+   * This function checks whether the user belongs to the blacklisted group.
+   * @param userName user name to impersonate
+   * @return userName if the name does not belong the blacklisted group.
+   * @throws TokenServiceException if user trying to impersonate a blacklisted group
+   */
+  String checkAgainstBlacklist(String userName) throws TokenServiceException {
+    if (blackListedSuperUsers != null && blackListedSuperUsers.contains(userName)) {
+      throw new TokenServiceException("Username: " + userName + " is blacklisted from fetching delegation token.",
+          ErrorCode.KUBERNETES_AUTHENTICATION_BLACKLIST_EXCEPTION);
+    }
+    return userName;
   }
 
   void updateWatchCache(Watch.Response<V1Pod> item) {

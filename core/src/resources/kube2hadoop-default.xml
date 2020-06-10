@@ -61,6 +61,12 @@
   </property>
 
   <property>
+    <description>Comma-separated list of users to blacklist</description>
+    <name>kube2hadoop.authenticator.blacklisted-users</name>
+    <value></value>
+  </property>
+
+  <property>
     <description>Location of Kubernetes token file</description>
     <name>kube2hadoop.token.location</name>
     <value>/path/to/token</value>
