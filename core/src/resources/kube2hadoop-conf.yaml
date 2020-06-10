@@ -67,6 +67,12 @@ data:
       </property>
 
       <property>
+        <description>Comma-separated list of users to blacklist</description>
+        <name>kube2hadoop.authenticator.blacklisted-users</name>
+        <value></value>
+      </property>
+
+      <property>
         <description>Location of Kubernetes token file</description>
         <name>kube2hadoop.token.location</name>
         <value>/var/run/secrets/kubernetes.io/serviceaccount/token</value>

@@ -21,7 +21,8 @@ public enum ErrorCode {
   SSL_CERT_EXCEPTION(112, "Unable to retrieve ssl certificate"),
   BEARER_TOKEN_EXCEPTION(113, "Failed to retrieve kubernetes bearer token"),
   READ_KEYTAB_EXCEPTION(114, "Failed to read keytab information"),
-  LDAP_LOOKUP_EXCEPTION(115, "Failed to authenticate user to access specified headless account");
+  LDAP_LOOKUP_EXCEPTION(115, "Failed to authenticate user to access specified headless account"),
+  KUBERNETES_AUTHENTICATION_BLACKLIST_EXCEPTION(116, "Username is blacklisted for fetching delegation token");
 
 
   private final int code;

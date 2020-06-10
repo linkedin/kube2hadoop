@@ -52,6 +52,7 @@ public class ConfigurationKeys {
   // Authenticator configurations
   public static final String KUBE2HADOOP_AUTHENTICATOR_LDAP_PROVIDER_URL = KUBERNETES_PREFIX + "authenticator.ldap-provider-url";
   public static final String KUBE2HAdOOP_AUTHENTICATOR_LDAP_GROUP_DOMAIN = KUBERNETES_PREFIX + "authenticator.ldap-group-domain";
+  public static final String KUBE2HADOOP_AUTHENTICATOR_BLACKLISTED_USERS = KUBERNETES_PREFIX + "authenticator.blacklisted-user";
 
 
   // Token renewer configurations
