@@ -1,6 +1,6 @@
 # Kube2Hadoop
 
-Use of Kubernetes have flourished for offline AI workload. Offline training jobs on Kubernetes, such as Tensorflow or Spark jobs need secure access to datalake like HDFS However, there exists a gap between the security model of Kubernetes and Hadoop. Kube2Hadoop bridges this gap by providing a scalable and secure integration of Kubernetes and HDFS Kerberos. Kube2Hadoop consists of three main components: 
+Use of Kubernetes has flourished for offline AI workloads. Offline training jobs on Kubernetes, such as TensorFlow or Spark jobs need secure access to datalake like HDFS. However, there exists a gap between the security model of Kubernetes and Hadoop. Kube2Hadoop bridges this gap by providing a scalable and secure integration of Kubernetes and HDFS Kerberos. Kube2Hadoop consists of three main components: 
 1. Hadoop Token Fetcher for fetching delegation tokens, deployed as Kubernetes Deployment.
 2. IDDecorator for writing authenticated user id, deployed as Kubernetes Admission Controller.
 3. Kube2Hadoop Init Container in each worker pod as client for sending request to fetch delegation token from Hadoop Token Service.
